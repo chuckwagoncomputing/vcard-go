@@ -7,6 +7,7 @@ import (
 	"os"
 	"reflect"
 	"strings"
+        "bytes"
 
 	"github.com/mapaiva/vcard-go/prop"
 )
@@ -89,8 +90,12 @@ func GetVCardsByFile(f *os.File) ([]VCard, error) {
 // GetVCardsByReader returns a list of vCards given an io.Reader.
 func GetVCardsByReader(r io.Reader) ([]VCard, error) {
 	vcList := make([]VCard, 0)
-	scanner := bufio.NewScanner(r)
+	fileIn := new(bytes.Buffer)
 	vc := new(VCard)
+
+        fileIn.ReadFrom(r)
+        fileBytes := bytes.Replace(fileIn.Bytes(), []byte{'\r', '\n', ' '}, []byte{}, -1)
+        scanner := bufio.NewScanner(bytes.NewReader(fileBytes))
 
 	for scanner.Scan() {
 		line := scanner.Text()
